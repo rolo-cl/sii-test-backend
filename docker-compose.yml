@@ -1,0 +1,27 @@
+# Runs the full solution (NestJS BFF + Angular app).
+# Expects the frontend repository cloned next to this one; override with FRONTEND_CONTEXT.
+name: pokemon-explorer
+
+services:
+  backend:
+    build: .
+    image: pokemon-explorer-backend
+    environment:
+      PORT: 3000
+      POKEAPI_BASE_URL: https://pokeapi.co/api/v2
+      CACHE_TTL_SECONDS: 3600
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    restart: unless-stopped
+
+  frontend:
+    build: ${FRONTEND_CONTEXT:-../sii-test-frontend}
+    image: pokemon-explorer-frontend
+    environment:
+      BFF_URL: http://backend:3000
+    ports:
+      - "${FRONTEND_PORT:-8080}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
