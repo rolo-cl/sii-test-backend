@@ -60,6 +60,8 @@ Todas las variables son opcionales (ver [`.env.example`](.env.example)):
 | `CACHE_TTL_SECONDS` | `3600` | TTL de la caché en memoria |
 | `CACHE_MAX_ENTRIES` | `500` | Máximo de detalles cacheados |
 | `SWAGGER_ENABLED` | `true` | Publica la documentación en `/api/docs`. Con `false` se desactiva |
+| `LOG_LEVEL` | `log` | Nivel mínimo: `fatal`, `error`, `warn`, `log`, `debug` o `verbose`. Con `debug` se ven las llamadas a PokéAPI y los fallos de caché |
+| `LOG_FORMAT` | `pretty` | `pretty` (legible) o `json` (una línea JSON por log, para agregadores) |
 
 ## API
 
@@ -94,6 +96,26 @@ Ejemplo de respuesta de detalle:
 
 Errores: `400` si los parámetros son inválidos, `404` si el Pokémon no existe, `502` o `504` si PokéAPI falla o no responde a tiempo.
 
+## Logs
+
+- **Un log por request** (middleware [`request-logging.middleware.ts`](src/middleware/request-logging.middleware.ts)): método, ruta, status y duración. Se registra como `LOG` si respondió bien, `WARN` para 4xx y `ERROR` para 5xx. El healthcheck de Docker solo se registra en nivel `verbose`, para no llenar los logs.
+- **Id de correlación**: cada request lleva un `X-Request-Id`. Lo envía el frontend o lo genera el BFF, y se devuelve en la respuesta. Gracias a `AsyncLocalStorage` ([`request-context.ts`](src/util/request-context.ts)), los logs del service y del DAO también incluyen ese id, sin pasarlo como parámetro. nginx también lo registra en su access log.
+- **Capa de datos**: con `LOG_LEVEL=debug` se registra cada llamada a PokéAPI con su duración, y cuando un detalle no estaba en caché. Timeouts y errores de PokéAPI se registran siempre.
+- Se usa el `ConsoleLogger` de Nest 11, que ya soporta JSON, así que no hay dependencias extra.
+
+```bash
+docker compose logs -f backend                       # logs del BFF
+LOG_LEVEL=debug docker compose up -d backend         # más detalle
+docker compose logs backend | grep <requestId>       # seguir un request puntual
+```
+
+Ejemplo con `LOG_LEVEL=debug LOG_FORMAT=json`:
+
+```json
+{"level":"debug","message":"[demo-123] PokéAPI GET https://pokeapi.co/api/v2/pokemon/eevee -> 200 (754ms)","context":"PokeApiDao"}
+{"level":"log","message":"[demo-123] GET /api/pokemon/eevee 200 980.6ms","context":"HTTP"}
+```
+
 ## Estructura del código
 
 El código está organizado por capas, al estilo Java EE. Cada request fluye `controller → service → dao`:
@@ -107,8 +129,9 @@ src/
 ├── dto/          Contratos de entrada (query params) y de respuesta hacia el frontend
 ├── mapper/       Conversión entity → DTO (unidades, idioma, orden)
 ├── pipe/         Validación del parámetro de ruta
-├── config/       Configuración leída desde variables de entorno
-├── util/         Utilidades genéricas (caché TTL, normalización de nombres)
+├── middleware/   Log de cada request e id de correlación (X-Request-Id)
+├── config/       Configuración leída desde variables de entorno y creación del logger
+├── util/         Utilidades genéricas (caché TTL, normalización de nombres, contexto del request)
 ├── app.module.ts Registro de controllers y providers (inyección de dependencias)
 ├── app.setup.ts  Prefijo /api, ValidationPipe global y Swagger
 └── main.ts       Punto de entrada

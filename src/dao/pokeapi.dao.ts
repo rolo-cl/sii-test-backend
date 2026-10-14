@@ -7,6 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { APP_CONFIG, type AppConfig } from '../config/app.config';
+import { withRequestId } from '../util/request-context';
 import type {
   PokeApiList,
   PokeApiPokemon,
@@ -38,6 +39,7 @@ export class PokeApiDao {
   }
 
   private async request<T>(url: string): Promise<T> {
+    const startedAt = Date.now();
     let response: Response;
     try {
       response = await fetch(url, {
@@ -46,18 +48,32 @@ export class PokeApiDao {
       });
     } catch (error) {
       if (error instanceof DOMException && error.name === 'TimeoutError') {
-        this.logger.warn(`Timeout calling ${url}`);
+        this.logger.warn(
+          withRequestId(
+            `Timeout llamando a ${url} (${this.config.pokeApiTimeoutMs}ms)`,
+          ),
+        );
         throw new GatewayTimeoutException('PokéAPI did not respond in time');
       }
-      this.logger.error(`Network error calling ${url}: ${String(error)}`);
+      this.logger.error(
+        withRequestId(`Error de red llamando a ${url}: ${String(error)}`),
+      );
       throw new BadGatewayException('PokéAPI is unreachable');
     }
+
+    this.logger.debug(
+      withRequestId(
+        `PokéAPI GET ${url} -> ${response.status} (${Date.now() - startedAt}ms)`,
+      ),
+    );
 
     if (response.status === 404) {
       throw new NotFoundException('Pokémon not found');
     }
     if (!response.ok) {
-      this.logger.error(`PokéAPI responded ${response.status} for ${url}`);
+      this.logger.error(
+        withRequestId(`PokéAPI respondió ${response.status} para ${url}`),
+      );
       throw new BadGatewayException('PokéAPI returned an unexpected error');
     }
 

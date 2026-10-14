@@ -39,7 +39,7 @@ describe('BFF (e2e)', () => {
       imports: [AppModule],
     }).compile();
 
-    app = moduleRef.createNestApplication();
+    app = moduleRef.createNestApplication({ logger: false });
     configureApp(app);
     setupSwagger(app);
     await app.init();
@@ -106,5 +106,30 @@ describe('BFF (e2e)', () => {
         '/api/health',
       ]),
     );
+  });
+
+  describe('X-Request-Id', () => {
+    it('genera un id cuando el request no trae uno', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/health')
+        .expect(200);
+      expect(res.headers['x-request-id']).toMatch(/^[0-9a-f-]{36}$/);
+    });
+
+    it('reutiliza el id enviado por el cliente', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/pokemon/pikachu')
+        .set('X-Request-Id', 'front-abc123')
+        .expect(200);
+      expect(res.headers['x-request-id']).toBe('front-abc123');
+    });
+
+    it('descarta ids con formato inseguro', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/health')
+        .set('X-Request-Id', 'evil id; <script>')
+        .expect(200);
+      expect(res.headers['x-request-id']).not.toContain('evil');
+    });
   });
 });

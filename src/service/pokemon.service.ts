@@ -10,6 +10,7 @@ import type {
   PokemonSummary,
 } from '../dto/pokemon-response.dto';
 import { normalizeName } from '../util/normalize-name';
+import { withRequestId } from '../util/request-context';
 
 export interface ListParams {
   page: number;
@@ -53,6 +54,10 @@ export class PokemonService {
   getDetail(idOrName: string): Promise<PokemonDetail> {
     const key = normalizeName(idOrName);
     return this.detailCache.getOrLoad(key, async () => {
+      // Solo se ejecuta cuando el detalle no está en caché.
+      this.logger.debug(
+        withRequestId(`Caché sin "${key}", consultando PokéAPI`),
+      );
       const pokemon = await this.pokeApiDao.getPokemon(key);
       const species = await this.getSpeciesSafely(pokemon.species.url);
       return toDetail(pokemon, species);
@@ -62,9 +67,15 @@ export class PokemonService {
   private getIndex(): Promise<PokemonSummary[]> {
     return this.indexCache.getOrLoad(INDEX_KEY, async () => {
       const { results } = await this.pokeApiDao.listAllPokemon();
-      return results
+      const index = results
         .map(toSummary)
         .filter((item): item is PokemonSummary => item !== null);
+      this.logger.log(
+        withRequestId(
+          `Índice de Pokémon cargado en caché: ${index.length} entradas`,
+        ),
+      );
+      return index;
     });
   }
 
@@ -87,7 +98,11 @@ export class PokemonService {
     try {
       return await this.pokeApiDao.getSpeciesByUrl(url);
     } catch (error) {
-      this.logger.warn(`Could not load species ${url}: ${String(error)}`);
+      this.logger.warn(
+        withRequestId(
+          `No se pudo cargar la especie ${url}; se entrega el detalle sin descripción: ${String(error)}`,
+        ),
+      );
       return null;
     }
   }
