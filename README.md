@@ -28,6 +28,22 @@ docker compose up --build
 
 El mismo `docker-compose.yml` existe en ambos repositorios, así que se puede levantar desde cualquiera de los dos. Si los repos no están en carpetas hermanas, indica la ruta con `FRONTEND_CONTEXT=/ruta/al/frontend docker compose up --build`. Los puertos se cambian con `FRONTEND_PORT` y `BACKEND_PORT`.
 
+### Atajo: scripts de arranque
+
+En [`devops/local/`](devops/local) hay scripts que hacen todo el arranque con un solo comando: detienen lo que esté corriendo, construyen y levantan los contenedores, y quedan mostrando los logs del BFF.
+
+| Sistema | Comando |
+| --- | --- |
+| Linux / macOS | `bash devops/local/go.sh` (ejecutar desde la raíz de este repo) |
+| Windows | `devops\local\go.bat` (también con doble clic; funciona desde cualquier carpeta) |
+
+Ambos ejecutan los mismos pasos:
+
+1. `docker compose ps`: muestra el estado actual.
+2. `docker compose down`: detiene y elimina los contenedores anteriores.
+3. `docker compose up -d --build frontend`: construye y levanta el frontend. Por `depends_on`, también levanta el BFF y espera a que esté saludable.
+4. `docker compose logs -f backend`: muestra los logs del BFF en vivo. Con `Ctrl+C` se sale de los logs y la app sigue corriendo; para detenerla, `docker compose down`.
+
 ### Solo el BFF
 
 ```bash
