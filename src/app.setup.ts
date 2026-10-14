@@ -3,7 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 export const SWAGGER_PATH = 'api/docs';
 
-/** HTTP-level setup shared by the real server and the e2e tests. */
+/** Configuración HTTP compartida entre el servidor real y los tests e2e. */
 export function configureApp(app: INestApplication): void {
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
@@ -16,14 +16,14 @@ export function configureApp(app: INestApplication): void {
 }
 
 /**
- * Serves the OpenAPI UI at /api/docs and the spec at /api/docs-json.
- * Schemas are generated at build time by the @nestjs/swagger CLI plugin (see nest-cli.json).
+ * Publica la UI de OpenAPI en /api/docs y el spec en /api/docs-json.
+ * Los esquemas los genera en el build el plugin de CLI de @nestjs/swagger (ver nest-cli.json).
  */
 export function setupSwagger(app: INestApplication): void {
   const config = new DocumentBuilder()
-    .setTitle('Pokémon Explorer BFF')
+    .setTitle('BFF Explorador de Pokémon')
     .setDescription(
-      'Backend for Frontend that exposes a trimmed, frontend-friendly view of PokéAPI.',
+      'Backend for Frontend que expone una vista reducida de PokéAPI, adaptada al frontend.',
     )
     .setVersion('1.0')
     .build();

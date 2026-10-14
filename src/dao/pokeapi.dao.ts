@@ -13,7 +13,7 @@ import type {
   PokeApiSpecies,
 } from '../entity/pokeapi.entity';
 
-/** Data access object for PokéAPI (thin HTTP client). Translates upstream failures into HTTP exceptions. */
+/** DAO de PokéAPI (cliente HTTP liviano). Traduce las fallas de PokéAPI a excepciones HTTP. */
 @Injectable()
 export class PokeApiDao {
   private readonly logger = new Logger(PokeApiDao.name);
@@ -21,7 +21,7 @@ export class PokeApiDao {
   constructor(@Inject(APP_CONFIG) private readonly config: AppConfig) {}
 
   listAllPokemon(): Promise<PokeApiList> {
-    // PokéAPI has no name search, so the full index (~1.3k entries, small payload) is fetched once.
+    // PokéAPI no permite buscar por nombre, así que se descarga una vez el índice completo (~1.300 entradas, payload liviano).
     return this.get<PokeApiList>('/pokemon?limit=100000&offset=0');
   }
 

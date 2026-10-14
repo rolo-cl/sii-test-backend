@@ -6,7 +6,7 @@ import { HealthStatus } from '../dto/health-status.dto';
 @Controller('health')
 export class HealthController {
   /**
-   * Liveness check used by the Docker healthcheck
+   * Verifica que el servicio está vivo (lo usa el healthcheck de Docker)
    */
   @Get()
   check(): HealthStatus {

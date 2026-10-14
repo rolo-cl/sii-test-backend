@@ -4,9 +4,9 @@ interface Entry<T> {
 }
 
 /**
- * Minimal in-memory cache with TTL and a size cap.
- * Stores promises so concurrent requests for the same key share one upstream call.
- * Failed loads are evicted immediately so errors are not cached.
+ * Caché mínima en memoria con TTL y límite de entradas.
+ * Guarda promesas, así los requests concurrentes por la misma clave comparten una sola llamada.
+ * Las cargas fallidas se eliminan de inmediato para no cachear errores.
  */
 export class TtlCache<T> {
   private readonly entries = new Map<string, Entry<T>>();
@@ -42,7 +42,7 @@ export class TtlCache<T> {
   }
 
   private evictOverflow(): void {
-    // Map preserves insertion order, so the first key is the oldest.
+    // Map conserva el orden de inserción, así que la primera clave es la más antigua.
     while (this.entries.size > this.maxEntries) {
       const oldest = this.entries.keys().next().value as string;
       this.entries.delete(oldest);

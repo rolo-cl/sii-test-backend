@@ -13,7 +13,7 @@ const ARTWORK_BASE_URL =
 
 const PREFERRED_LANGUAGES = ['es', 'en'];
 
-/** Extracts the numeric id from a PokéAPI resource URL (".../pokemon/25/"). */
+/** Extrae el id numérico de una URL de recurso de PokéAPI (".../pokemon/25/"). */
 export function idFromResourceUrl(url: string): number | null {
   const match = /\/(\d+)\/?$/.exec(url);
   return match ? Number(match[1]) : null;
@@ -40,7 +40,7 @@ function pickByLanguage<T extends { language: NamedApiResource }>(
   return undefined;
 }
 
-/** Flavor texts come from game cartridges and include form feeds and hard line breaks. */
+/** Las descripciones vienen de los juegos e incluyen saltos de página y de línea forzados. */
 function cleanFlavorText(text: string): string {
   return text
     .replace(/[\f\n\r\u00ad]+/g, ' ')

@@ -68,7 +68,7 @@ export class PokemonService {
     });
   }
 
-  /** Substring match, with names that start with the term ranked first. */
+  /** Coincidencia parcial; primero van los nombres que empiezan con el término. */
   private filterByName(
     index: PokemonSummary[],
     term: string,
@@ -82,7 +82,7 @@ export class PokemonService {
     return [...prefix, ...contains];
   }
 
-  /** Species data only enriches the detail; its failure should not break the page. */
+  /** Los datos de especie solo complementan el detalle; si fallan, el detalle se entrega igual. */
   private async getSpeciesSafely(url: string): Promise<PokeApiSpecies | null> {
     try {
       return await this.pokeApiDao.getSpeciesByUrl(url);

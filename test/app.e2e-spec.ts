@@ -10,7 +10,7 @@ import {
   pikachuSpeciesFixture,
 } from './fixtures/pokeapi.fixtures';
 
-/** Stubs global fetch so the BFF runs end to end without reaching PokéAPI. */
+/** Simula el fetch global para probar el BFF de punta a punta sin llamar a PokéAPI. */
 function mockPokeApi(): jest.SpyInstance {
   return jest.spyOn(global, 'fetch').mockImplementation((input) => {
     const url =

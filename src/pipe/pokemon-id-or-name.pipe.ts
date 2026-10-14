@@ -3,7 +3,7 @@ import { normalizeName } from '../util/normalize-name';
 
 const VALID_ID_OR_NAME = /^[a-z0-9-]{1,50}$/;
 
-/** Rejects malformed identifiers before they reach PokéAPI. */
+/** Rechaza identificadores mal formados antes de que lleguen a PokéAPI. */
 @Injectable()
 export class PokemonIdOrNamePipe implements PipeTransform<string, string> {
   transform(value: string): string {

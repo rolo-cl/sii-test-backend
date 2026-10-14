@@ -1,18 +1,18 @@
-// Response contracts exposed to the frontend. Decoupled from PokéAPI's raw shape.
-// Declared as classes (not interfaces) so the Swagger CLI plugin can generate their schemas;
-// JSDoc comments become property descriptions and examples.
+// Contratos de respuesta que se exponen al frontend, independientes del formato de PokéAPI.
+// Son clases (no interfaces) para que el plugin de Swagger pueda generar sus esquemas;
+// los comentarios JSDoc pasan a ser las descripciones y ejemplos de cada propiedad.
 
 export class PokemonSummary {
   /** @example 25 */
   id!: number;
   /** @example "pikachu" */
   name!: string;
-  /** Official artwork URL derived from the id. */
+  /** URL del artwork oficial, derivada del id. */
   image!: string;
 }
 
 export class PokemonPage {
-  /** Total Pokémon matching the search (not just this page). @example 1351 */
+  /** Total de Pokémon que coinciden con la búsqueda (no solo los de esta página). @example 1351 */
   count!: number;
   /** @example 1 */
   page!: number;
@@ -33,7 +33,7 @@ export class PokemonStat {
 export class PokemonAbility {
   /** @example "static" */
   name!: string;
-  /** Hidden abilities only appear under special conditions. */
+  /** Las habilidades ocultas solo aparecen en condiciones especiales. */
   hidden!: boolean;
 }
 
@@ -43,18 +43,18 @@ export class PokemonDetail {
   /** @example "pikachu" */
   name!: string;
   image!: string | null;
-  /** Metres. @example 0.4 */
+  /** Metros. @example 0.4 */
   height!: number;
-  /** Kilograms. @example 6 */
+  /** Kilogramos. @example 6 */
   weight!: number;
   /** @example 112 */
   baseExperience!: number | null;
-  /** Ordered by slot. @example ["electric"] */
+  /** Ordenados por slot. @example ["electric"] */
   types!: string[];
   abilities!: PokemonAbility[];
   stats!: PokemonStat[];
-  /** Category in Spanish, falling back to English. @example "Pokémon Ratón" */
+  /** Categoría en español, o en inglés si no existe. @example "Pokémon Ratón" */
   genus!: string | null;
-  /** Flavor text in Spanish, falling back to English. */
+  /** Descripción en español, o en inglés si no existe. */
   description!: string | null;
 }

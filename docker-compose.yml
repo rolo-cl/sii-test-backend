@@ -1,5 +1,5 @@
-# Runs the full solution (NestJS BFF + Angular app).
-# Expects the frontend repository cloned next to this one; override with FRONTEND_CONTEXT.
+# Levanta la solución completa (BFF en NestJS + app en Angular).
+# Espera el repositorio del frontend clonado junto a este; se puede cambiar con FRONTEND_CONTEXT.
 name: pokemon-explorer
 
 services:

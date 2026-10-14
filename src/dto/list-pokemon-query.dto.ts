@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 
 export class ListPokemonQueryDto {
-  /** 1-based page number. */
+  /** Número de página, empezando en 1. */
   @ApiPropertyOptional()
   @IsOptional()
   @Type(() => Number)
@@ -18,7 +18,7 @@ export class ListPokemonQueryDto {
   @Min(1)
   page: number = 1;
 
-  /** Items per page. */
+  /** Cantidad de resultados por página. */
   @ApiPropertyOptional()
   @IsOptional()
   @Type(() => Number)
@@ -28,7 +28,7 @@ export class ListPokemonQueryDto {
   pageSize: number = 24;
 
   /**
-   * Partial, case-insensitive name match. Names starting with the term are ranked first.
+   * Búsqueda parcial por nombre, sin distinguir mayúsculas. Primero van los nombres que empiezan con el término.
    * @example "char"
    */
   @IsOptional()

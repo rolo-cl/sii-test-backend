@@ -1,4 +1,4 @@
-// Subset of the PokéAPI v2 payloads actually used by the BFF.
+// Subconjunto de las respuestas de PokéAPI v2 que realmente usa el BFF.
 
 export interface NamedApiResource {
   name: string;
@@ -13,8 +13,8 @@ export interface PokeApiList {
 export interface PokeApiPokemon {
   id: number;
   name: string;
-  height: number; // decimetres
-  weight: number; // hectograms
+  height: number; // decímetros
+  weight: number; // hectogramos
   base_experience: number | null;
   types: { slot: number; type: NamedApiResource }[];
   abilities: { is_hidden: boolean; slot: number; ability: NamedApiResource }[];

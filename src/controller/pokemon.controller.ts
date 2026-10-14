@@ -13,31 +13,32 @@ import { PokemonService } from '../service/pokemon.service';
 import { PokemonIdOrNamePipe } from '../pipe/pokemon-id-or-name.pipe';
 
 @ApiTags('pokemon')
-@ApiBadGatewayResponse({ description: 'PokéAPI failed or is unreachable' })
-@ApiGatewayTimeoutResponse({ description: 'PokéAPI did not respond in time' })
+@ApiBadGatewayResponse({ description: 'PokéAPI falló o no está disponible' })
+@ApiGatewayTimeoutResponse({ description: 'PokéAPI no respondió a tiempo' })
 @Controller('pokemon')
 export class PokemonController {
   constructor(private readonly pokemonService: PokemonService) {}
 
   /**
-   * List the catalog, paginated and optionally filtered by name
+   * Lista el catálogo paginado, con filtro opcional por nombre
    */
-  @ApiBadRequestResponse({ description: 'Invalid query parameters' })
+  @ApiBadRequestResponse({ description: 'Parámetros de consulta inválidos' })
   @Get()
   list(@Query() query: ListPokemonQueryDto): Promise<PokemonPage> {
     return this.pokemonService.list(query);
   }
 
   /**
-   * Get the detail of a Pokémon
+   * Obtiene el detalle de un Pokémon
    */
   @ApiParam({
     name: 'idOrName',
-    description: 'Pokémon name (case-insensitive) or national dex id',
+    description:
+      'Nombre del Pokémon (sin distinguir mayúsculas) o su número de Pokédex nacional',
     example: 'pikachu',
   })
-  @ApiBadRequestResponse({ description: 'Malformed id or name' })
-  @ApiNotFoundResponse({ description: 'Pokémon not found' })
+  @ApiBadRequestResponse({ description: 'Id o nombre con formato inválido' })
+  @ApiNotFoundResponse({ description: 'Pokémon no encontrado' })
   @Get(':idOrName')
   detail(
     @Param('idOrName', PokemonIdOrNamePipe) idOrName: string,
